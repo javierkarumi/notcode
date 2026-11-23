@@ -331,8 +331,8 @@ struct MCPPool: Codable, Equatable {
     var projectBindings: [MCPProjectBinding] = []
     var enabledSyncApps: Set<MCPClientApp> = [.claudeCode, .cursor, .codex]
     var syncMode: MCPSyncMode = .direct
-    /// When true, NotCode prompts the user to choose a profile when an agent works in an unbound project.
-    var askProfileForNewProjects: Bool = true
+    /// When true, NotCode prompts the user to choose a profile when an agent works in an unbound project. Off by default: new projects use the active profile.
+    var askProfileForNewProjects: Bool = false
     var lastScanDate: Date?
     var lastSyncDate: Date?
 

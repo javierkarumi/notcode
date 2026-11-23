@@ -652,6 +652,7 @@ final class MCPHubTests: XCTestCase {
 
         var pool = MCPPool()
         pool.enabledSyncApps = [] // keep test isolated from host filesystem
+        pool.askProfileForNewProjects = true // off by default; this test covers the ask path
         try MCPPoolStore.save(pool, to: tmp)
 
         // 1. initialize
