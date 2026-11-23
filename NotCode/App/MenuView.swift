@@ -25,12 +25,49 @@ struct MenuView: View {
                 Text("⚠️ \(short(problem))")
                     .help(problem)
             }
+            if state.sleepDisabled {
+                Text("☕ Mac won't sleep, even with the lid closed")
+            }
+            if let sleepError = state.sleepError {
+                Text("⚠️ \(short(sleepError))")
+                    .help(sleepError)
+            }
+
+            Divider()
+
+            Menu("MCP Profile: \(state.mcpPool.activeProfile.name)") {
+                ForEach(state.mcpPool.profiles) { profile in
+                    Button {
+                        state.switchProfile(profile.id, syncImmediately: true)
+                    } label: {
+                        let count = state.mcpPool.resolvedServers(for: profile).count
+                        let mark = profile.id == state.mcpPool.activeProfileID ? "✓ " : ""
+                        Text("\(mark)\(profile.name) (\(count) MCPs)")
+                    }
+                }
+                Divider()
+                Button("Sync All Apps Now") {
+                    state.syncMCPs()
+                }
+                Button("Scan & Import MCPs") {
+                    state.scanMCPs()
+                }
+            }
+            if let mcpMsg = state.mcpStatusMessage {
+                Text("MCP: \(short(mcpMsg))")
+                    .help(mcpMsg)
+            }
 
             Divider()
 
             Button(state.config.paused ? "Resume Notifications" : "Pause Notifications") {
                 state.config.paused.toggle()
             }
+
+            Button(state.sleepDisabled ? "Let Mac Sleep" : "Keep Mac Awake") {
+                state.toggleSleep()
+            }
+            .help("Switches macOS sleep off or on for the whole system (pmset disablesleep). Asks for your password.")
 
             Button("Test: Sound + WhatsApp to Me") {
                 state.sendTestNotification()
@@ -50,6 +87,11 @@ struct MenuView: View {
                     Button("⬇️ Download \(update)…") { state.performUpdate() }
                     Text("Auto-update is off for this build; opens the download page")
                 }
+            } else {
+                Button(state.updateStatus == .checking ? "Checking for Updates…" : "Check for Updates…") {
+                    state.checkForUpdates(userInitiated: true)
+                }
+                .disabled(state.updateStatus == .checking)
             }
 
             Divider()
